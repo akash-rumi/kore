@@ -18,7 +18,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // PHASE 4: register AI service as singleton
+        $this->app->singleton(\App\Services\CourseAiService::class);
     }
 
     /**
@@ -26,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // PHASE 5: Bootstrap 5 pagination
+        Paginator::useBootstrapFive();
+        
         // Events (merged from EventServiceProvider)
         Event::listen(
             Registered::class,

@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\CourseAiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
+    public function __construct( private CourseAiService $aiService ) {}
     public function index()
     {
         // BUG FIX: added eager loading to prevent N+1 queries
@@ -40,6 +42,14 @@ class DashboardController extends Controller
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
         }
 
+        // PHASE 4: AI-generated curriculum topics
+        $topics = $this->aiService->generateTopics(
+            $request->title,
+            $request->description,
+            $request->category,
+            $request->level
+        );
+
         Course::create([
             'instructor_id' => Auth::id(),
             'title' => $request->title,
@@ -51,8 +61,27 @@ class DashboardController extends Controller
             'level' => $request->level,
             'thumbnail' => $thumbnailPath,
             'is_published' => true,
+            'topics' => $topics,
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Course uploaded successfully.');
+    }
+    
+    // PHASE 4: AJAX endpoint — generate description suggestion from title
+    public function suggestDescription(Request $request)
+    {
+        $request->validate([
+            'title'    => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string'],
+            'level'    => ['required', 'string'],
+        ]);
+
+        $description = $this->aiService->generateDescription(
+            $request->title,
+            $request->category,
+            $request->level
+        );
+
+        return response()->json(['description' => $description]);
     }
 }

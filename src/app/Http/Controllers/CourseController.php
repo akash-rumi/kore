@@ -25,17 +25,23 @@ class CourseController extends Controller
 
         $courses = $query->latest()->paginate(9);
 
-        $categories = Course::where('is_published', true)
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+        $categories = Cache::remember('course_categories', 3600, function () {
+            return Course::where('is_published', true)
+                ->select('category')
+                ->distinct()
+                ->orderBy('category')
+                ->pluck('category');
+        });
 
         return view('courses.index', compact('courses', 'categories'));
     }
 
     public function show($slug)
     {
-        $course = Course::with('instructor')->where('slug', $slug)->firstOrFail();
+        $course = Course::with('instructor')
+            ->where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
 
         return view('courses.show', compact('course'));
     }
