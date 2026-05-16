@@ -23,7 +23,13 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'));
+
+            // BUG FIX: redirect by role. Non-admins must NOT go to /dashboard (admin-only)
+            $user = Auth::user();
+            if ($user->isAdmin()) {
+                return redirect()->intended(route('dashboard'));
+            }
+            return redirect()->intended(route('student.dashboard'));
         }
 
         return back()->withErrors([
@@ -53,7 +59,8 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home.index');
+        // BUG FIX: was route('home.index') does not exist.
+        return redirect()->route('home');
     }
 
     public function logout(Request $request)

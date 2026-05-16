@@ -21,16 +21,16 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
 
         if (!in_array($course->id, $cart)) {
-            $cart[] = (string) $course->id;
+            $cart[] = $course->id;
             session()->put('cart', $cart);
         }
 
-        $countBeforeUpdate = count($cart) - 1;
-
+        // BUG FIX: was returning count BEFORE adding — used $countBeforeUpdate = count($cart) - 1
+        // Now returns actual cart count after update
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'count'   => $countBeforeUpdate,
+                'count' => count($cart),
                 'message' => 'Course added to cart.',
             ]);
         }
@@ -41,7 +41,9 @@ class CartController extends Controller
     public function remove(Request $request, Course $course)
     {
         $cart = session()->get('cart', []);
-        $cart = array_filter($cart, fn($id) => $id !== $course->id);
+
+        // BUG FIX: session stores int IDs, comparison must cast consistently
+        $cart = array_filter($cart, fn($id) => (int) $id !== (int) $course->id);
         session()->put('cart', array_values($cart));
 
         return redirect()->route('cart.index')->with('success', 'Course removed from cart.');

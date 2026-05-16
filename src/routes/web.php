@@ -7,6 +7,8 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StudentController;
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -28,6 +30,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+
+    Route::get('/my-learning', [StudentController::class, 'dashboard'])->name('student.dashboard');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

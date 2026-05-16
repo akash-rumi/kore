@@ -13,10 +13,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // BUG FIX: added eager loading to prevent N+1 queries
         $totalUsers = User::count();
-        $users      = User::latest()->get();
-        $courses    = Course::with('instructor')->latest()->get();
-        $orders     = Order::with(['user', 'course'])->orderBy('created_at', 'desc')->get();
+        $users = User::latest()->get();
+        $courses = Course::with('instructor')->latest()->get();
+        $orders = Order::with(['user', 'course'])->latest()->get();
 
         return view('dashboard.index', compact('totalUsers', 'users', 'courses', 'orders'));
     }
@@ -24,11 +25,13 @@ class DashboardController extends Controller
     public function storeCourse(Request $request)
     {
         $request->validate([
-            'title'       => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:500'],
-            'price'       => ['required', 'numeric', 'min:0'],
-            'category'    => ['required', 'string'],
-            'thumbnail'   => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'category' => ['required', 'string'],
+            // BUG FIX: level was missing from validation — always defaulted to 'beginner'
+            'level' => ['required', 'in:beginner,intermediate,advanced'],
+            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
 
         $thumbnailPath = null;
@@ -39,13 +42,15 @@ class DashboardController extends Controller
 
         Course::create([
             'instructor_id' => Auth::id(),
-            'title'         => $request->title,
-            'slug'          => Str::slug($request->title),
-            'description'   => $request->description,
-            'price'         => $request->price,
-            'category'      => $request->category,
-            'thumbnail'     => $thumbnailPath,
-            'is_published'  => true,
+            'title' => $request->title,
+            'slug' => Str::slug($request->title) . '-' . Str::random(4),
+            'description' => $request->description,
+            'price' => $request->price,
+            'category' => $request->category,
+            // BUG FIX: level now saved from form input
+            'level' => $request->level,
+            'thumbnail' => $thumbnailPath,
+            'is_published' => true,
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Course uploaded successfully.');

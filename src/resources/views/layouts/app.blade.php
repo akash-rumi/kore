@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'KoreSearch') — Learn & Grow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,11 @@
             <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Home</a></li>
             <li><a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">Courses</a></li>
             @auth
-                <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}">Dashboard</a></li>
+                @if(Auth::user()->isAdmin())
+                    <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                @else
+                    <li><a href="{{ route('student.dashboard') }}">My Learning</a></li>
+                @endif
             @endauth
             <li>
                 <a href="{{ route('cart.index') }}" class="cart-link {{ request()->routeIs('cart.*') ? 'active' : '' }}">
@@ -52,7 +56,11 @@
                             <strong>{{ Auth::user()->name }}</strong>
                             <small>{{ Auth::user()->email }}</small>
                         </div>
-                        <a href="{{ route('dashboard') }}">Dashboard</a>
+                        @if(Auth::user()->isAdmin())
+                            <a href="{{ route('dashboard') }}">Dashboard</a>
+                        @else
+                            <a href="{{ route('student.dashboard') }}">My Learning</a>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="dropdown-logout">Logout</button>
@@ -106,6 +114,6 @@
     </div>
 </footer>
 
-<script src="{{ asset('js/application.js') }}"></script>
+<script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>
