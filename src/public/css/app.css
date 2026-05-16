@@ -1991,3 +1991,130 @@ ul {
         justify-content: center;
     }
 }
+
+/* ── Phase 7: UI/UX Improvements ─────────────────────────── */
+
+/* Flash alerts */
+.flash-alert {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 280px;
+    max-width: 420px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.15);
+    animation: slideInRight .3s ease;
+}
+@keyframes slideInRight {
+    from { transform: translateX(120%); opacity: 0; }
+    to   { transform: translateX(0);   opacity: 1; }
+}
+.alert-success { background: #ecfdf5; color: #065f46; border-left: 4px solid #10b981; }
+.alert-error   { background: #fef2f2; color: #991b1b; border-left: 4px solid #ef4444; }
+.alert-info    { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
+.alert-close   { background: none; border: none; cursor: pointer; font-size: 1.2rem; opacity: .6; line-height: 1; }
+.alert-close:hover { opacity: 1; }
+
+/* AI suggest button */
+.btn-ai-suggest {
+    margin-left: 10px;
+    padding: 3px 10px;
+    font-size: .75rem;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity .2s;
+}
+.btn-ai-suggest:hover   { opacity: .85; }
+.btn-ai-suggest:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Upload form subtitle */
+.upload-form-subtitle {
+    color: var(--text-muted);
+    font-size: .875rem;
+    margin-bottom: var(--space-md);
+}
+
+/* Student Dashboard */
+.student-dashboard-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: var(--space-xl);
+    padding: var(--space-xl) 0;
+}
+@media (max-width: 768px) {
+    .student-dashboard-grid { grid-template-columns: 1fr; }
+}
+.student-profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    height: fit-content;
+}
+.student-avatar-circle {
+    width: 72px; height: 72px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; font-weight: 700;
+    margin: 0 auto var(--space-md);
+}
+.student-name    { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+.student-email   { color: var(--text-muted); font-size: .85rem; margin-bottom: 4px; }
+.student-headline{ font-size: .875rem; color: var(--text-secondary); }
+.student-stats {
+    display: flex; gap: var(--space-md);
+    justify-content: center;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+}
+.student-stat strong { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.student-stat span   { font-size: .75rem; color: var(--text-muted); }
+
+.student-course-card {
+    display: flex; gap: var(--space-md); align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    transition: box-shadow .2s;
+}
+.student-course-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.student-course-thumb {
+    width: 100px; height: 68px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+.student-course-info  { flex: 1; }
+.student-course-title { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+.student-course-title a { color: var(--text-primary); text-decoration: none; }
+.student-course-title a:hover { color: var(--primary); }
+.student-course-meta  { font-size: .8rem; color: var(--text-muted); margin-bottom: 4px; }
+.student-order-meta   { font-size: .75rem; color: var(--text-muted); }
+.student-course-status { text-align: right; flex-shrink: 0; }
+.student-course-price  { font-size: .85rem; color: var(--text-muted); margin-top: 6px; }
+
+.empty-state-box {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xxl);
+    text-align: center;
+    color: var(--text-muted);
+}
+.mt-sm { margin-top: var(--space-sm); }

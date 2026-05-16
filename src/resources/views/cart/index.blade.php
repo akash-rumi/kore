@@ -26,7 +26,7 @@
                 @foreach($courses as $course)
                     <div class="cart-item">
                         <img
-                            src="{{ $course->thumbnail ?? 'https://placehold.co/120x80' }}"
+                            src="{{ $course->thumbnail ? asset('storage/'.$course->thumbnail) : 'https://placehold.co/120x80' }}"
                             alt="{{ $course->title }}"
                             class="cart-item-thumb"
                             onerror="this.src='https://placehold.co/120x80'"
@@ -48,7 +48,7 @@
                         <form method="POST" action="{{ route('cart.remove', $course->id) }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn-remove-cart" title="Remove">✕</button>
+                            <button type="submit" class="btn-remove-cart" title="Remove from cart">✕</button>
                         </form>
                     </div>
                 @endforeach
@@ -57,7 +57,7 @@
             <div class="cart-summary">
                 <h3 class="cart-summary-title">Order Summary</h3>
                 <div class="cart-summary-row">
-                    <span>Subtotal</span>
+                    <span>{{ $courses->count() }} course{{ $courses->count() !== 1 ? 's' : '' }}</span>
                     <span>৳{{ number_format($total) }}</span>
                 </div>
                 <div class="cart-summary-row total">
@@ -65,18 +65,20 @@
                     <strong>৳{{ number_format($total) }}</strong>
                 </div>
 
+                {{-- FIX: clean single checkout button, no @foreach/@break hack --}}
                 @auth
-                    @foreach($courses as $course)
-                        <a href="{{ route('checkout.index') }}" class="btn btn-accent btn-block mt-md">
-                            Proceed to Checkout
-                        </a>
-                        @break
-                    @endforeach
+                    <a href="{{ route('checkout.index') }}" class="btn btn-accent btn-block mt-md">
+                        Proceed to Checkout
+                    </a>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-primary btn-block mt-md">
                         Login to Checkout
                     </a>
                 @endauth
+
+                <a href="{{ route('courses.index') }}" class="btn btn-outline btn-block mt-sm">
+                    Continue Browsing
+                </a>
             </div>
         </div>
     @endif

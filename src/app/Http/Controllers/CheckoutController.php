@@ -26,27 +26,25 @@ class CheckoutController extends Controller
     public function process(Request $request)
     {
         $request->validate([
-            'transaction_number' => ['required', 'string', 'min:6'],
             'course_id'          => ['required', 'exists:courses,id'],
+            'transaction_number' => ['required', 'string', 'max:255'],
         ]);
 
         $course = Course::findOrFail($request->course_id);
 
         $order = Order::create([
             'user_id'            => Auth::id(),
-            'course_id'          => $course->id,
+            'course_id'          => $request->course_id,
             'transaction_number' => $request->transaction_number,
             'amount'             => $course->price,
             'status'             => 'pending',
         ]);
 
-        $cart = session()->get('cart', []);
-        $cart = array_filter($cart, fn($id) => $id !== (string) $course->id);
-        session()->put('cart', array_values($cart));
+        // BUG FIX: clear cart after successful checkout
+        session()->forget('cart');
 
         return redirect()->route('checkout.confirmation', $order->id);
     }
-
     public function confirmation(Order $order)
     {
         $order->load('course', 'user');

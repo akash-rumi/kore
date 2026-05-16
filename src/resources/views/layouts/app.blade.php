@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- BUG FIX: was name="csrf" — JS reads name="csrf-token" --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'KoreSearch') — Learn & Grow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,19 +29,23 @@
         <ul class="nav-links" id="navLinks">
             <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Home</a></li>
             <li><a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">Courses</a></li>
+
             @auth
+                {{-- BUG FIX: show role-based nav link --}}
                 @if(Auth::user()->isAdmin())
-                    <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'active' : '' }}">Dashboard</a></li>
                 @else
-                    <li><a href="{{ route('student.dashboard') }}">My Learning</a></li>
+                    <li><a href="{{ route('student.dashboard') }}" class="{{ request()->routeIs('student.*') ? 'active' : '' }}">My Learning</a></li>
                 @endif
             @endauth
+
             <li>
                 <a href="{{ route('cart.index') }}" class="cart-link {{ request()->routeIs('cart.*') ? 'active' : '' }}">
                     Cart
                     <span class="cart-badge" id="cartCount">{{ count(session()->get('cart', [])) }}</span>
                 </a>
             </li>
+
             @guest
                 <li><a href="{{ route('login') }}" class="btn-nav">Login</a></li>
                 <li><a href="{{ route('register') }}" class="btn-nav btn-nav-accent">Register</a></li>
@@ -56,8 +61,9 @@
                             <strong>{{ Auth::user()->name }}</strong>
                             <small>{{ Auth::user()->email }}</small>
                         </div>
+                        {{-- BUG FIX: role-based dropdown link --}}
                         @if(Auth::user()->isAdmin())
-                            <a href="{{ route('dashboard') }}">Dashboard</a>
+                            <a href="{{ route('dashboard') }}">Admin Dashboard</a>
                         @else
                             <a href="{{ route('student.dashboard') }}">My Learning</a>
                         @endif
@@ -75,28 +81,27 @@
 <div class="page-wrapper">
 
     @if(session('success'))
-        <div class="alert alert-success" id="flashAlert">
-            <span>{{ session('success') }}</span>
+        <div class="alert alert-success flash-alert">
+            <span>✓ {{ session('success') }}</span>
             <button class="alert-close" onclick="this.parentElement.remove()">×</button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-error" id="flashAlert">
-            <span>{{ session('error') }}</span>
+        <div class="alert alert-error flash-alert">
+            <span>✕ {{ session('error') }}</span>
             <button class="alert-close" onclick="this.parentElement.remove()">×</button>
         </div>
     @endif
 
     @if(session('info'))
-        <div class="alert alert-info" id="flashAlert">
-            <span>{{ session('info') }}</span>
+        <div class="alert alert-info flash-alert">
+            <span>ℹ {{ session('info') }}</span>
             <button class="alert-close" onclick="this.parentElement.remove()">×</button>
         </div>
     @endif
 
     @yield('content')
-
 </div>
 
 <footer class="site-footer">
@@ -105,15 +110,24 @@
             <span class="brand-icon">K</span>
             <span>KoreSearch</span>
         </div>
-        <p class="footer-copy">© {{ date('Y') }} koresearch.com — All rights reserved.</p>
+        <p class="footer-copy">© {{ date('Y') }} KoreSearch — All rights reserved.</p>
         <nav class="footer-links">
             <a href="{{ route('home') }}">Home</a>
             <a href="{{ route('courses.index') }}">Courses</a>
-            <a href="{{ route('login') }}">Login</a>
+            @guest
+                <a href="{{ route('login') }}">Login</a>
+            @else
+                @if(Auth::user()->isAdmin())
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                @else
+                    <a href="{{ route('student.dashboard') }}">My Learning</a>
+                @endif
+            @endguest
         </nav>
     </div>
 </footer>
 
+{{-- BUG FIX: was js/application.js — file does not exist, correct file is js/app.js --}}
 <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

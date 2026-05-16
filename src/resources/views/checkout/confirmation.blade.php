@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Payment Confirmed — KoreSearch')
+@section('title', 'Order Confirmed — KoreSearch')
 
 @section('content')
 
@@ -40,12 +40,17 @@
         </div>
 
         <p class="confirmation-note">
-            Our team will verify your bKash transaction and activate your course access within 24 hours.
+            Our team will verify your bKash transaction and activate your course within 24 hours.
         </p>
 
         <div class="confirmation-actions">
             <a href="{{ route('courses.index') }}" class="btn btn-primary">Browse More Courses</a>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline">Go to Dashboard</a>
+            {{-- BUG FIX: was route('dashboard') — students get 403. Now role-based. --}}
+            @if(Auth::user()->isAdmin())
+                <a href="{{ route('dashboard') }}" class="btn btn-outline">Admin Dashboard</a>
+            @else
+                <a href="{{ route('student.dashboard') }}" class="btn btn-outline">My Learning</a>
+            @endif
         </div>
     </div>
 </div>

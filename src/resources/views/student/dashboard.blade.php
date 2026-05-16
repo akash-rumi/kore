@@ -12,22 +12,20 @@
 </div>
 
 <div class="container">
-
     <div class="student-dashboard-grid">
 
         <div class="student-profile-card">
+            <div class="student-avatar-circle">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
             <h2 class="student-name">{{ $user->name }}</h2>
             <p class="student-email">{{ $user->email }}</p>
-            @if($user->headline)
+            @if($user->headline ?? null)
                 <p class="student-headline">{{ $user->headline }}</p>
             @endif
-            @if($user->location)
-                <p class="student-location">{{ $user->location }}</p>
-            @endif
+
             <div class="student-stats">
                 <div class="student-stat">
                     <strong>{{ $orders->count() }}</strong>
-                    <span>Courses Enrolled</span>
+                    <span>Enrolled</span>
                 </div>
                 <div class="student-stat">
                     <strong>{{ $orders->where('status', 'completed')->count() }}</strong>
@@ -42,10 +40,10 @@
             @forelse($orders as $order)
                 <div class="student-course-card">
                     <img
-                        src="{{ $order->course->thumbnail ?? 'https://placehold.co/80x56' }}"
+                        src="{{ $order->course->thumbnail ? asset('storage/'.$order->course->thumbnail) : 'https://placehold.co/100x68' }}"
                         alt="{{ $order->course->title }}"
                         class="student-course-thumb"
-                        onerror="this.src='https://placehold.co/80x56'"
+                        onerror="this.src='https://placehold.co/100x68'"
                     >
                     <div class="student-course-info">
                         <h3 class="student-course-title">
@@ -56,7 +54,6 @@
                         <p class="student-course-meta">
                             <span class="badge badge-{{ $order->course->level }}">{{ ucfirst($order->course->level) }}</span>
                             · {{ $order->course->category }}
-                            · {{ $order->course->duration ?? 'Self-paced' }}
                         </p>
                         <p class="student-order-meta">
                             Order #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
@@ -73,7 +70,7 @@
             @empty
                 <div class="empty-state-box">
                     <p>You haven't enrolled in any courses yet.</p>
-                    <a href="{{ route('courses.index') }}" class="btn btn-primary">Browse Courses</a>
+                    <a href="{{ route('courses.index') }}" class="btn btn-primary mt-sm">Browse Courses</a>
                 </div>
             @endforelse
         </div>
